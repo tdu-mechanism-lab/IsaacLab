@@ -48,6 +48,7 @@ import gymnasium as gym
 import os
 import time
 import torch
+import csv
 
 from rsl_rl.runners import OnPolicyRunner
 
@@ -137,6 +138,15 @@ def main():
 
     dt = env.unwrapped.step_dt
 
+    scene = env.unwrapped.scene
+    robot = scene["robot"]
+    joint_names = robot.data.joint_names  
+    csv_file = open(os.path.join(log_dir, "torques_log.csv"), "w", newline="")
+    writer = csv.writer(csv_file)
+  
+    writer.writerow(["timestep"] + joint_names)
+
+
     # reset environment
     obs, _ = env.get_observations()
     timestep = 0
@@ -149,16 +159,27 @@ def main():
             actions = policy(obs)
             # env stepping
             obs, _, _, _ = env.step(actions)
+            
+        timestep += 1
+        torques = robot.data.applied_torque.cpu().numpy()  
+        torques_env0 = torques[0] 
+        # print(dt)
+
         if args_cli.video:
             timestep += 1
             # Exit the play loop after recording one video
             if timestep == args_cli.video_length:
                 break
 
+        time_sec = timestep * dt
+        writer.writerow([time_sec] + torques_env0.tolist())
+
         # time delay for real-time evaluation
         sleep_time = dt - (time.time() - start_time)
         if args_cli.real_time and sleep_time > 0:
             time.sleep(sleep_time)
+
+    csv_file.close() 
 
     # close the simulator
     env.close()
