@@ -114,3 +114,23 @@ def stand_still_joint_deviation_l1(
     command = env.command_manager.get_command(command_name)
     # Penalize motion when command is nearly zero.
     return mdp.joint_deviation_l1(env, asset_cfg) * (torch.norm(command[:, :2], dim=1) < command_threshold)
+
+def feet_clearance(
+    env: ManagerBasedRLEnv,
+    asset_cfg: SceneEntityCfg,
+    target_height: float = 0.05,
+) -> torch.Tensor:
+    """Reward the robot for lifting its feet above a target height."""
+
+    # robot articulation
+    asset = env.scene[asset_cfg.name]
+
+    # foot height (num_envs, num_feet)
+    foot_height = asset.data.body_pos_w[:, asset_cfg.body_ids, 2]
+
+    # reward for exceeding threshold
+    clearance = torch.clamp(foot_height - target_height, min=0.0)
+
+    # average across feet → (num_envs,)
+    return torch.mean(clearance, dim=1)
+
