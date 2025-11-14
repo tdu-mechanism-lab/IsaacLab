@@ -76,9 +76,10 @@ UNITREE_A1_CFG = ArticulationCfg(
         joint_pos={
             ".*L_hip_joint": 0.1,
             ".*R_hip_joint": -0.1,
-            "F[L,R]_thigh_joint": 0.8,
-            "R[L,R]_thigh_joint": 1.0,
-            ".*_calf_joint": -1.5,
+            "F[L,R]_thigh_joint": -0.972665,
+            "R[L,R]_thigh_joint": -0.472665,
+            ".*_calf_joint": 1.74533,
+            ".*_calf2_joint": -0.972665,
         },
         joint_vel={".*": 0.0},
     ),
