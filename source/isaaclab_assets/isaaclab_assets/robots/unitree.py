@@ -74,8 +74,8 @@ UNITREE_A1_CFG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.42),
         joint_pos={
-            ".*L_hip_joint": 0.1,
-            ".*R_hip_joint": -0.1,
+            ".*L_hip_joint": 0.05,
+            ".*R_hip_joint": -0.05,
             "F[L,R]_thigh_joint": -0.972665,
             "R[L,R]_thigh_joint": -0.472665,
             ".*_calf_joint": 1.74533,

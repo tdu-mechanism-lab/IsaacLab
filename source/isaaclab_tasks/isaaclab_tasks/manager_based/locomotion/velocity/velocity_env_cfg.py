@@ -244,6 +244,14 @@ class RewardsCfg:
     dof_torques_l2 = RewTerm(func=mdp.joint_torques_l2, weight=-1.0e-5)
     dof_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.01)
+    feet_torque = RewTerm(
+    func=mdp.joint_torques_weighted,
+    weight=-1.0e-5, 
+    params={
+        "asset_cfg": SceneEntityCfg("robot"),
+        "joint_weights": None
+        },
+    )   
     feet_clearance = RewTerm(
         func=mdp.feet_clearance,
         weight=0.2,

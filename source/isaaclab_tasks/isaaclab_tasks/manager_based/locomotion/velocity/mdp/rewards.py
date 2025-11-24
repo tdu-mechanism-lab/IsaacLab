@@ -134,3 +134,45 @@ def feet_clearance(
     # average across feet → (num_envs,)
     return torch.mean(clearance, dim=1)
 
+def joint_torques_weighted(
+    env: ManagerBasedRLEnv,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    joint_weights: dict | list | None = None,
+) -> torch.Tensor:
+    """
+    Joint-wise weighted L2 penalty on applied torques.
+
+    - joint_weights can be:
+      * dict: { "FR_hip_joint": 1.0, "FR_thigh_joint": 0.5, ... }
+      * list/tuple/torch.tensor: must match asset.data.joint_names order
+      * None: fallback (uniform weights = 1.0)
+
+    Returns (num_envs,) tensor (unweighted by the RewTerm.weight; RewardManager multiplies by weight).
+    """
+    asset = env.scene[asset_cfg.name]
+    # applied torque (num_envs, num_joints)
+    torques = asset.data.applied_torque  # torch.Tensor on device
+
+    num_joints = torques.shape[1]
+
+    # build weight vector (torch) aligned with joint ordering
+    if joint_weights is None:
+        w = torch.ones(num_joints, device=torques.device, dtype=torques.dtype)
+    else:
+        # if dict mapping names->scale
+        if isinstance(joint_weights, dict):
+            names = list(asset.data.joint_names)  # list of str
+            vals = []
+            for n in names:
+                vals.append(joint_weights.get(n, 1.0))  # default 1.0 if not provided
+            w = torch.tensor(vals, device=torques.device, dtype=torques.dtype)
+        else:
+            # list/tuple/tensor: assume same order as asset.data.joint_names
+            w = torch.tensor(joint_weights, device=torques.device, dtype=torques.dtype)
+            if w.numel() != num_joints:
+                raise ValueError("joint_weights length does not match number of joints")
+
+    # elementwise weighted square, then sum over joints -> (num_envs,)
+    per_joint_sq = torch.square(torques) * w.unsqueeze(0)
+    return torch.sum(per_joint_sq, dim=1)
+
