@@ -52,10 +52,10 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = ".*_calf2"
         self.rewards.feet_air_time.weight = 0.02
         self.rewards.feet_torque.params["joint_weights"] = {
-            "FR_hip_joint": 0.5, "FR_thigh_joint": 0.2, "FR_calf_joint": 0.5, "FR_calf2_joint": 1.0,
-            "FL_hip_joint": 0.5, "FL_thigh_joint": 0.2, "FL_calf_joint": 0.5, "FL_calf2_joint": 1.0,
-            "RR_hip_joint": 0.5, "RR_thigh_joint": 0.2, "RR_calf_joint": 0.5, "RR_calf2_joint": 1.0,
-            "RL_hip_joint": 0.5, "RL_thigh_joint": 0.2, "RL_calf_joint": 0.5, "RL_calf2_joint": 1.0,
+            "FR_hip_joint": 0.5, "FR_thigh_joint": 1.0, "FR_calf_joint": 0.5, "FR_calf2_joint": 0.2,
+            "FL_hip_joint": 0.5, "FL_thigh_joint": 1.0, "FL_calf_joint": 0.5, "FL_calf2_joint": 0.2,
+            "RR_hip_joint": 0.5, "RR_thigh_joint": 1.0, "RR_calf_joint": 0.5, "RR_calf2_joint": 0.2,
+            "RL_hip_joint": 0.5, "RL_thigh_joint": 1.0, "RL_calf_joint": 0.5, "RL_calf2_joint": 0.2,
         }
         # global scale still set in cfg, e.g.
         self.rewards.feet_torque.weight = -2.0e-5
