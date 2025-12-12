@@ -56,7 +56,7 @@ This model is taken from: https://github.com/Improbable-AI/walk-these-ways
 
 UNITREE_A1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"/home/t-yajima/Downloads/horse_front/horse_front.usd",
+        usd_path=f"/home/t-yajima/Downloads/3-link/3-link.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
