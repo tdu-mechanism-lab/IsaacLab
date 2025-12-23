@@ -56,7 +56,7 @@ This model is taken from: https://github.com/Improbable-AI/walk-these-ways
 
 UNITREE_A1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"/home/t-yajima/Downloads/3-link/3-link.usd",
+        usd_path=f"/home/t-yajima/Downloads/horse/horse.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -74,12 +74,14 @@ UNITREE_A1_CFG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.42),
         joint_pos={
-            ".*L_hip_joint": 0.05,
-            ".*R_hip_joint": -0.05,
-            "F[L,R]_thigh_joint": -0.972665,
-            "R[L,R]_thigh_joint": -0.472665,
-            ".*_calf_joint": 1.74533,
-            ".*_calf2_joint": -0.972665,
+            ".*L_hip_joint": 0.1,
+            ".*R_hip_joint": -0.1,
+            "F[L,R]_thigh_joint": 0.523599,
+            "R[L,R]_thigh_joint": -0.261799,
+            "F[L,R]_calf_joint": -1.047200,
+            "R[L,R]_calf_joint": 0.959931,
+            "F[L,R]_calf2_joint": 0.087266,
+            "R[L,R]_calf2_joint": -1.221730,
         },
         joint_vel={".*": 0.0},
     ),

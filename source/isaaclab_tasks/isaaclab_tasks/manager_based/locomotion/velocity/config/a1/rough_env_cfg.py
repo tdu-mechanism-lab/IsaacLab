@@ -50,26 +50,26 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # rewards
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = ".*_calf2"
-        self.rewards.feet_air_time.weight = 0.02
+        self.rewards.feet_air_time.weight = 0.05
         # self.rewards.feet_torque.params["joint_weights"] = {
-        #     "FR_hip_joint": 0.5, "FR_thigh_joint": 1.0, "FR_calf_joint": 0.5, "FR_calf2_joint": 0.2,
-        #     "FL_hip_joint": 0.5, "FL_thigh_joint": 1.0, "FL_calf_joint": 0.5, "FL_calf2_joint": 0.2,
-        #     "RR_hip_joint": 0.5, "RR_thigh_joint": 1.0, "RR_calf_joint": 0.5, "RR_calf2_joint": 0.2,
-        #     "RL_hip_joint": 0.5, "RL_thigh_joint": 1.0, "RL_calf_joint": 0.5, "RL_calf2_joint": 0.2,
+        #     "FR_hip_joint": 1.0, "FR_thigh_joint": 0.1, "FR_calf_joint": 0.1, "FR_calf2_joint": 0.1,
+        #     "FL_hip_joint": 1.0, "FL_thigh_joint": 0.1, "FL_calf_joint": 0.1, "FL_calf2_joint": 0.1,
+        #     "RR_hip_joint": 1.0, "RR_thigh_joint": 0.1, "RR_calf_joint": 0.1, "RR_calf2_joint": 0.1,
+        #     "RL_hip_joint": 1.0, "RL_thigh_joint": 0.1, "RL_calf_joint": 0.1, "RL_calf2_joint": 0.1,
         # }
-        # global scale still set in cfg, e.g.
+        # # global scale still set in cfg, e.g.
         # self.rewards.feet_torque.weight = -0.0002
         self.rewards.feet_clearance.params["asset_cfg"].body_names = ".*_calf2"
-        self.rewards.feet_clearance.weight = 0.3
+        self.rewards.feet_clearance.weight = 0.1
         self.rewards.feet_clearance.params["target_height"] = 0.05
-        self.rewards.undesired_contacts = None
+        self.rewards.undesired_contacts.weight = -2.0
         self.rewards.dof_torques_l2.weight = -0.0002
-        self.rewards.track_lin_vel_xy_exp.weight = 1.5
-        self.rewards.track_ang_vel_z_exp.weight = 0.75
-        self.rewards.dof_acc_l2.weight = -2.5e-9
+        self.rewards.track_lin_vel_xy_exp.weight = 3.0
+        self.rewards.track_ang_vel_z_exp.weight = 1.5
+        self.rewards.dof_acc_l2.weight = -2.5e-6
 
         # terminations
-        self.terminations.base_contact.params["sensor_cfg"].body_names = "base_link"
+        self.terminations.base_contact.params["sensor_cfg"].body_names = "(base_link|.*(hip|thigh|calf(?!2)).*)"
 
 
 @configclass
