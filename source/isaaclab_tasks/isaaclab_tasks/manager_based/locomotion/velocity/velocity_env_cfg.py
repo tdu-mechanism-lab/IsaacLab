@@ -100,7 +100,7 @@ class CommandsCfg:
         heading_control_stiffness=0.5,
         debug_vis=True,
         ranges=mdp.UniformVelocityCommandCfg.Ranges(
-            lin_vel_x=(-0.5, 2.0), lin_vel_y=(-0.5, 0.5), ang_vel_z=(-0.1, 0.1), heading=(-math.pi, math.pi)
+            lin_vel_x=(2.0, 2.0), lin_vel_y=(-0.0, 0.0), ang_vel_z=(-0.1, 0.1), heading=(-0, 0)
         ),
     )
 
@@ -275,7 +275,7 @@ class RewardsCfg:
         params={
             "sensor_cfg": SceneEntityCfg(
                 "contact_forces",
-                body_names=".*(base_link|HIP|THIGH|CALF)$"
+                body_names=".*(trunk|HIP|THIGH|CALF)$"
             ),
             "threshold": 1.0,
         },

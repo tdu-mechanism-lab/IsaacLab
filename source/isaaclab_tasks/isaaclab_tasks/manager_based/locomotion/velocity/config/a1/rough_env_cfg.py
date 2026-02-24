@@ -20,7 +20,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         self.scene.robot = UNITREE_A1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
-        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base_link"
+        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/trunk"
         # scale down the terrains because the robot is small
         self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
         self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
@@ -32,8 +32,8 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # event
         self.events.push_robot = None
         self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
-        self.events.add_base_mass.params["asset_cfg"].body_names = "base_link"
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = "base_link"
+        self.events.add_base_mass.params["asset_cfg"].body_names = "trunk"
+        self.events.base_external_force_torque.params["asset_cfg"].body_names = "trunk"
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
         self.events.reset_base.params = {
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
@@ -49,7 +49,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.base_com = None
 
         # rewards
-        self.rewards.feet_air_time.params["sensor_cfg"].body_names = ".*_calf2"
+        self.rewards.feet_air_time.params["sensor_cfg"].body_names = ".*_foot"
         self.rewards.feet_air_time.weight = 0.05
         # self.rewards.feet_torque.params["joint_weights"] = {
         #     "FR_hip_joint": 1.0, "FR_thigh_joint": 0.1, "FR_calf_joint": 0.1, "FR_calf2_joint": 0.1,
@@ -59,7 +59,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # }
         # # global scale still set in cfg, e.g.
         # self.rewards.feet_torque.weight = -0.0002
-        self.rewards.feet_clearance.params["asset_cfg"].body_names = ".*_calf2"
+        self.rewards.feet_clearance.params["asset_cfg"].body_names = ".*_foot"
         self.rewards.feet_clearance.weight = 0.1
         self.rewards.feet_clearance.params["target_height"] = 0.05
         self.rewards.undesired_contacts.weight = -2.0
@@ -69,7 +69,10 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.dof_acc_l2.weight = -2.5e-7
 
         # terminations
-        self.terminations.base_contact.params["sensor_cfg"].body_names = "(base_link|.*(hip|thigh|calf(?!2)).*)"
+        # 3link
+        self.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk|.*(hip|thigh|calf(?!2)).*)"
+        # 2link
+        self.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk|.*(hip|thigh|calf).*)"
 
 
 @configclass
