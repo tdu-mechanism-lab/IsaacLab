@@ -100,7 +100,8 @@ class CommandsCfg:
         heading_control_stiffness=0.5,
         debug_vis=True,
         ranges=mdp.UniformVelocityCommandCfg.Ranges(
-            lin_vel_x=(2.0, 2.0), lin_vel_y=(-0.0, 0.0), ang_vel_z=(-0.1, 0.1), heading=(-0, 0)
+            lin_vel_x=(-0.5, 2.0), lin_vel_y=(-0.5, 0.5), ang_vel_z=(-0.1, 0.1), heading=(-math.pi, math.pi)
+            # lin_vel_x=(1.0, 1.0), lin_vel_y=(-0.0, 0.0), ang_vel_z=(-0.1, 0.1), heading=(-0, 0)
         ),
     )
 
@@ -239,7 +240,7 @@ class RewardsCfg:
         func=mdp.track_ang_vel_z_exp, weight=0.5, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
     )
     # -- penalties
-    lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-4.0)
+    lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-2.0)
     ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.1)
     dof_torques_l2 = RewTerm(func=mdp.joint_torques_l2, weight=-1.0e-5)
     dof_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
@@ -256,15 +257,15 @@ class RewardsCfg:
         func=mdp.feet_clearance,
         weight=0.2,
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*FOOT"),
-            "target_height": 0.08,
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*foot"),
+            "target_height": 0.05,
         },
     )
     feet_air_time = RewTerm(
         func=mdp.feet_air_time,
         weight=0.125,
         params={
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"),
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*foot"),
             "command_name": "base_velocity",
             "threshold": 0.5,
         },
@@ -281,7 +282,7 @@ class RewardsCfg:
         },
     )
     # -- optional penalties
-    flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=0.0)
+    flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=-2.5)
     dof_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=0.0)
 
 
