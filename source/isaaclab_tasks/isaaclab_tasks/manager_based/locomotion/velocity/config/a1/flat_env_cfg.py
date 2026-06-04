@@ -15,7 +15,7 @@ class UnitreeA1FlatEnvCfg(UnitreeA1RoughEnvCfg):
         super().__post_init__()
 
         # override rewards
-        self.rewards.flat_orientation_l2.weight = -1.0
+        self.rewards.flat_orientation_l2.weight = -0.5
         self.rewards.feet_air_time.weight = 0.25
 
         # change terrain to flat
