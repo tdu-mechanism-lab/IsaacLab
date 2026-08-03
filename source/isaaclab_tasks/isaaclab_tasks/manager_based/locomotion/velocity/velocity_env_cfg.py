@@ -253,14 +253,37 @@ class RewardsCfg:
         "joint_weights": None
         },
     )   
-    feet_clearance = RewTerm(
-        func=mdp.feet_clearance,
-        weight=0.2,
-        params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*foot"),
-            "target_height": 0.05,
-        },
-    )
+    # feet_clearance_with_phase = RewTerm(
+    #     func=mdp.feet_clearance_with_phase,
+    #     weight=0.2,
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*foot"),
+    #         "target_height": 0.05,
+    #         "phase_freq": 1.0,
+    #     },
+    # )
+
+    # calf2_joint_motion = RewTerm(
+    #     func=mdp.calf2_joint_motion,
+    #     weight=0.5,
+    #     params={
+    #         "asset_cfg": SceneEntityCfg(
+    #             "robot",
+    #             joint_names=["FR_calf2_joint", "FL_calf2_joint",
+    #                          "RR_calf2_joint", "RL_calf2_joint"]
+    #         ),
+    #     },
+    # )
+    # feet_clearance = RewTerm(
+    #     func=mdp.feet_clearance,
+    #     weight=0.1,
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*_foot"),
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_foot"),
+    #         "target_height": 0.05,
+    #         "contact_threshold": 1.0,
+    #     },
+    # )
     feet_air_time = RewTerm(
         func=mdp.feet_air_time,
         weight=0.125,

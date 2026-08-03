@@ -11,6 +11,7 @@ from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import Lo
 # Pre-defined configs
 ##
 from isaaclab_assets.robots.unitree import UNITREE_A1_CFG  # isort: skip
+from isaaclab.managers import SceneEntityCfg
 
 
 @configclass
@@ -59,9 +60,21 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         }
         # global scale still set in cfg, e.g.
         self.rewards.feet_torque.weight = -0.0002
-        self.rewards.feet_clearance.params["asset_cfg"].body_names = ".*_foot"
-        self.rewards.feet_clearance.weight = 0.1
-        self.rewards.feet_clearance.params["target_height"] = 0.05
+        # self.rewards.feet_clearance_with_phase.params["asset_cfg"].body_names = ".*_foot"
+        # self.rewards.feet_clearance_with_phase.weight = 0.1
+        # self.rewards.feet_clearance_with_phase.params["target_height"] = 0.05
+        # self.rewards.feet_clearance_with_phase.params["phase_freq"] = 1.0
+
+        # self.rewards.calf2_joint_motion.params["asset_cfg"].joint_names = [
+        #     "FR_calf2_joint", "FL_calf2_joint",
+        #     "RR_calf2_joint", "RL_calf2_joint"
+        # ]
+        # self.rewards.calf2_joint_motion.weight = 0.2
+        # self.rewards.feet_clearance.params["asset_cfg"].body_names = ".*_foot"
+        # self.rewards.feet_clearance.params["sensor_cfg"] = SceneEntityCfg("contact_forces", body_names=".*_foot")
+        # self.rewards.feet_clearance.weight = 0.1
+        # self.rewards.feet_clearance.params["target_height"] = 0.05
+        # self.rewards.feet_clearance.params["contact_threshold"] = 1.0
         self.rewards.undesired_contacts.weight = -2.0
         self.rewards.dof_torques_l2.weight = -0.0002
         self.rewards.track_lin_vel_xy_exp.weight = 3.0

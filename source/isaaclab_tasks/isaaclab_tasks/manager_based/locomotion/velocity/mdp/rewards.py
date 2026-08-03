@@ -116,23 +116,118 @@ def stand_still_joint_deviation_l1(
     return mdp.joint_deviation_l1(env, asset_cfg) * (torch.norm(command[:, :2], dim=1) < command_threshold)
 
 def feet_clearance(
+        # version 1
+#     env: ManagerBasedRLEnv,
+#     asset_cfg: SceneEntityCfg,
+#     target_height: float = 0.05,
+# ) -> torch.Tensor:
+#     """Reward the robot for lifting its feet above a target height."""
+
+#     # robot articulation
+#     asset = env.scene[asset_cfg.name]
+
+#     # foot height (num_envs, num_feet)
+#     foot_height = asset.data.body_pos_w[:, asset_cfg.body_ids, 2]
+
+#     # reward for exceeding threshold
+#     clearance = torch.clamp(foot_height - target_height, min=0.0)
+
+#     # average across feet → (num_envs,)
+#     return torch.mean(clearance, dim=1)
+
+        # version 2
+#     env: ManagerBasedRLEnv,
+#     asset_cfg: SceneEntityCfg,
+#     target_height: float = 0.05,
+#     contact_threshold: float = 1.0,
+# ) -> torch.Tensor:
+#     asset = env.scene[asset_cfg.name]
+
+#     # 足先の高さ
+#     foot_height = asset.data.body_pos_w[:, asset_cfg.body_ids, 2]
+
+#     # 接地力（接触センサーがある場合）
+#     # contact = env.scene["contact_sensor"].data.net_forces_w[:, asset_cfg.body_ids, 2]
+#     # swing_mask = (contact.abs() < contact_threshold).float()  # 非接地=スイング相
+
+#     # 接触センサーがない場合：高さで判定
+#     swing_mask = (foot_height > 0.01).float()  # 地面から少し上=スイング中
+
+#     clearance = torch.clamp(foot_height - target_height, min=0.0)
+
+#     # スイング相の脚のみ報酬
+#     return torch.mean(clearance * swing_mask, dim=1)
+
+        # version 3
     env: ManagerBasedRLEnv,
     asset_cfg: SceneEntityCfg,
+    sensor_cfg: SceneEntityCfg,
     target_height: float = 0.05,
+    contact_threshold: float = 1.0,
 ) -> torch.Tensor:
-    """Reward the robot for lifting its feet above a target height."""
-
-    # robot articulation
+    """接地していない脚（スイング相）にのみクリアランス報酬を与える。
+    全脚が均等にスイングするよう、各脚ごとの報酬を均す項も加える。
+    """
     asset = env.scene[asset_cfg.name]
+    contact_sensor = env.scene[sensor_cfg.name]
 
-    # foot height (num_envs, num_feet)
+    # 足先の高さ
     foot_height = asset.data.body_pos_w[:, asset_cfg.body_ids, 2]
 
-    # reward for exceeding threshold
-    clearance = torch.clamp(foot_height - target_height, min=0.0)
+    # 接触力の履歴から接地判定（実際の物理接触で判定。高さに依存しない）
+    net_forces = contact_sensor.data.net_forces_w_history[:, :, sensor_cfg.body_ids, :]
+    contact_force_mag = torch.norm(net_forces, dim=-1).max(dim=1)[0]  # (N, num_feet)
+    is_swing = (contact_force_mag < contact_threshold).float()
 
-    # average across feet → (num_envs,)
-    return torch.mean(clearance, dim=1)
+    clearance = torch.clamp(foot_height - target_height, min=0.0)
+    per_foot_reward = clearance * is_swing  # (N, num_feet)
+
+    # 単純平均ではなく、各脚の寄与が均等になるよう
+    # 「最も報酬の低い脚」にも報酬を与えやすくする（minを混ぜる）
+    mean_reward = torch.mean(per_foot_reward, dim=1)
+    min_reward  = torch.min(per_foot_reward, dim=1).values
+
+    # meanとminの加重平均：1本だけ上げる戦略を抑制しつつ完全な厳格化を避ける
+    return 0.5 * mean_reward + 0.5 * min_reward
+
+# def feet_clearance_with_phase(
+#     env: ManagerBasedRLEnv,
+#     asset_cfg: SceneEntityCfg,
+#     target_height: float = 0.05,
+#     phase_freq: float = 1.0,
+# ) -> torch.Tensor:
+#     """歩行位相に基づいてスイング相の脚に足先クリアランス報酬を与える"""
+
+#     asset = env.scene[asset_cfg.name]
+#     foot_height = asset.data.body_pos_w[:, asset_cfg.body_ids, 2]
+
+#     # 歩行位相（0〜2π）
+#     phase = env.episode_length_buf * env.step_dt * 2 * torch.pi * phase_freq
+
+#     # ウォーク位相オフセット FR=0, FL=π/2, RR=π, RL=3π/2
+#     offsets = torch.tensor(
+#         [0.0, 0.5 * torch.pi, torch.pi, 1.5 * torch.pi],
+#         device=env.device
+#     )
+#     phase_per_foot = phase.unsqueeze(1) + offsets.unsqueeze(0)  # (N, 4)
+
+#     # sin > 0 のときスイング相
+#     swing_mask = (torch.sin(phase_per_foot) > 0).float()
+
+#     clearance = torch.clamp(foot_height - target_height, min=0.0)
+#     return torch.mean(clearance * swing_mask, dim=1)
+
+
+def calf2_joint_motion(
+    env: ManagerBasedRLEnv,
+    asset_cfg: SceneEntityCfg,
+) -> torch.Tensor:
+    """calf2_jointの動きを促進する報酬"""
+
+    asset = env.scene[asset_cfg.name]
+    joint_vel = asset.data.joint_vel[:, asset_cfg.joint_ids]
+    return torch.mean(torch.abs(joint_vel), dim=1)
+
 
 def joint_torques_weighted(
     env: ManagerBasedRLEnv,
