@@ -21,7 +21,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         self.scene.robot = UNITREE_A1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
-        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/trunk"
+        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/trunk_front"
         # scale down the terrains because the robot is small
         self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
         self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
@@ -33,8 +33,8 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # event
         self.events.push_robot = None
         self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
-        self.events.add_base_mass.params["asset_cfg"].body_names = "trunk"
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = "trunk"
+        self.events.add_base_mass.params["asset_cfg"].body_names = "trunk_.*"
+        self.events.base_external_force_torque.params["asset_cfg"].body_names = "trunk_front"
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
         self.events.reset_base.params = {
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
@@ -83,9 +83,9 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # terminations
         # 3link
-        # self.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk|.*(hip|thigh|calf(?!2)).*)"
+        self.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk_front|trunk_rear|head_neck|.*(hip|thigh|calf(?!2)).*)"
         # 2link
-        self.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk|.*(hip|thigh).*)"
+        # self.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk_front|trunk_rear|head_neck|.*(hip|thigh).*)"
 
 
 @configclass

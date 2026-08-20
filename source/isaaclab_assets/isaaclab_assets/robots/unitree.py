@@ -105,6 +105,13 @@ UNITREE_A1_CFG = ArticulationCfg(
             damping=0.5,
             friction=0.0,
         ),
+        "spine_neck": ImplicitActuatorCfg(
+            joint_names_expr=["spine_joint", "neck_joint"],
+            effort_limit=30.0,
+            velocity_limit=21.0,
+            stiffness=20.0,
+            damping=0.5,
+        ), 
     },
 )
 """Configuration of Unitree A1 using DC motor.

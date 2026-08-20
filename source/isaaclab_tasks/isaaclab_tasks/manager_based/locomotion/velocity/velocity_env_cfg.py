@@ -299,7 +299,7 @@ class RewardsCfg:
         params={
             "sensor_cfg": SceneEntityCfg(
                 "contact_forces",
-                body_names=".*(trunk|HIP|THIGH|CALF)$"
+                body_names=".*(trunk_front|trunk_rear|head_neck|HIP|THIGH|CALF)$"
             ),
             "threshold": 1.0,
         },
