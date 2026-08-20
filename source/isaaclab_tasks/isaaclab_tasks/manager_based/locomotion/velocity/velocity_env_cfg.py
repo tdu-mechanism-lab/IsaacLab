@@ -284,6 +284,23 @@ class RewardsCfg:
     #         "contact_threshold": 1.0,
     #     },
     # )
+    joint_anchor = RewTerm(
+        func=mdp.joint_default_deviation_l2, weight=-0.05,
+        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_calf2_joint"])},
+    )
+    leg_work_share = RewTerm(
+        func=mdp.joint_velocity_uniformity, weight=-0.02,
+        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[
+            "FL_thigh_joint","FL_calf_joint","FL_calf2_joint",
+            "FR_thigh_joint","FR_calf_joint","FR_calf2_joint",
+            "RL_thigh_joint","RL_calf_joint","RL_calf2_joint",
+            "RR_thigh_joint","RR_calf_joint","RR_calf2_joint"], preserve_order=True)},
+    )
+    fore_hind_balance = RewTerm(
+        func=mdp.fore_hind_contact_balance, weight=0.5,
+        params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names=[
+            "FL_foot","FR_foot","RL_foot","RR_foot"], preserve_order=True)},
+    )
     feet_air_time = RewTerm(
         func=mdp.feet_air_time,
         weight=0.125,

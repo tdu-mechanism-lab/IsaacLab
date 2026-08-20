@@ -57,7 +57,7 @@ This model is taken from: https://github.com/Improbable-AI/walk-these-ways
 
 UNITREE_A1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"/home/t-yajima/Downloads/dog1_neckjoint_massed/dog1_neckjoint_massed.usd",
+        usd_path=f"/home/t-yajima/Downloads/horse_kubo_v2_vis/horse_kubo_v2_vis.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -75,22 +75,22 @@ UNITREE_A1_CFG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.42),
         joint_pos={
-            # ".*L_hip_joint": 0.01,
-            # ".*R_hip_joint": -0.01,
-            # "F[L,R]_thigh_joint": 0.326,
-            # "R[L,R]_thigh_joint": 0.199,
-            # "F[L,R]_calf_joint": -0.312,
-            # "R[L,R]_calf_joint": 0.680,
-            # "F[L,R]_calf2_joint": -0.256,
-            # "R[L,R]_calf2_joint": -0.652,
             ".*L_hip_joint": 0.01,
             ".*R_hip_joint": -0.01,
             "F[L,R]_thigh_joint": 0.326,
             "R[L,R]_thigh_joint": 0.199,
             "F[L,R]_calf_joint": -0.312,
-            "R[L,R]_calf_joint": 0.3,
+            "R[L,R]_calf_joint": 0.680,
             "F[L,R]_calf2_joint": -0.256,
-            "R[L,R]_calf2_joint": -0.4,
+            "R[L,R]_calf2_joint": -0.652,
+            # ".*L_hip_joint": 0.01,
+            # ".*R_hip_joint": -0.01,
+            # "F[L,R]_thigh_joint": 0.299,
+            # "R[L,R]_thigh_joint": -0.193,
+            # "F[L,R]_calf_joint": -0.524,
+            # "R[L,R]_calf_joint": 0.606,
+            # "F[L,R]_calf2_joint": 0.224,
+            # "R[L,R]_calf2_joint": -0.836,
         },
         joint_vel={".*": 0.0},
     ),
