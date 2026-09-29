@@ -110,3 +110,21 @@ class UnitreeA1RoughEnvCfg_PLAY(UnitreeA1RoughEnvCfg):
         # remove random pushing event
         self.events.base_external_force_torque = None
         self.events.push_robot = None
+        self.events.add_base_mass = None
+
+        # --- 直線・最大速度で前進 (動画・定量評価用) ---
+        cmd = self.commands.base_velocity
+        cmd.heading_command = False                  # 方位追従による旋回を停止
+        cmd.rel_heading_envs = 0.0
+        cmd.rel_standing_envs = 0.0                  # 静止する個体をなくす
+        cmd.resampling_time_range = (1.0e9, 1.0e9)   # 途中で指令を変えない
+        cmd.ranges.lin_vel_x = (2.0, 2.0)            # 学習時レンジの上限
+        cmd.ranges.lin_vel_y = (0.0, 0.0)
+        cmd.ranges.ang_vel_z = (0.0, 0.0)
+        cmd.debug_vis = False                        # 指令矢印を描画しない
+
+        # 初期ヨー角のランダム化も止める (全個体を同じ向きに揃える)
+        self.events.reset_base.params["pose_range"] = {
+            "x": (0.0, 0.0), "y": (0.0, 0.0), "yaw": (0.0, 0.0)
+        }
+

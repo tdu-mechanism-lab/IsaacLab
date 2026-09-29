@@ -57,7 +57,7 @@ This model is taken from: https://github.com/Improbable-AI/walk-these-ways
 
 UNITREE_A1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"/home/t-yajima/Downloads/horse_kubo_v2_vis/horse_kubo_v2_vis.usd",
+        usd_path=f"/home/t-yajima/Downloads/dog1_neckjoint_massed_standanchor/dog1_neckjoint_massed_standanchor.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -75,22 +75,22 @@ UNITREE_A1_CFG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.42),
         joint_pos={
-            ".*L_hip_joint": 0.01,
-            ".*R_hip_joint": -0.01,
-            "F[L,R]_thigh_joint": 0.326,
-            "R[L,R]_thigh_joint": 0.199,
-            "F[L,R]_calf_joint": -0.312,
-            "R[L,R]_calf_joint": 0.680,
-            "F[L,R]_calf2_joint": -0.256,
-            "R[L,R]_calf2_joint": -0.652,
             # ".*L_hip_joint": 0.01,
             # ".*R_hip_joint": -0.01,
-            # "F[L,R]_thigh_joint": 0.299,
-            # "R[L,R]_thigh_joint": -0.193,
-            # "F[L,R]_calf_joint": -0.524,
-            # "R[L,R]_calf_joint": 0.606,
-            # "F[L,R]_calf2_joint": 0.224,
-            # "R[L,R]_calf2_joint": -0.836,
+            # "F[L,R]_thigh_joint": 0.326,
+            # "R[L,R]_thigh_joint": 0.199,
+            # "F[L,R]_calf_joint": -0.312,
+            # "R[L,R]_calf_joint": 0.680,
+            # "F[L,R]_calf2_joint": -0.256,
+            # "R[L,R]_calf2_joint": -0.652,
+            ".*L_hip_joint": 0.01,
+            ".*R_hip_joint": -0.01,
+            "F[L,R]_thigh_joint": 0.299,
+            "R[L,R]_thigh_joint": -0.193,
+            "F[L,R]_calf_joint": -0.524,
+            "R[L,R]_calf_joint": 0.606,
+            "F[L,R]_calf2_joint": 0.224,
+            "R[L,R]_calf2_joint": -0.836,
         },
         joint_vel={".*": 0.0},
     ),
@@ -105,13 +105,13 @@ UNITREE_A1_CFG = ArticulationCfg(
             damping=0.5,
             friction=0.0,
         ),
-        "spine_neck": ImplicitActuatorCfg(
-            joint_names_expr=["spine_joint", "neck_joint"],
-            effort_limit=30.0,
-            velocity_limit=21.0,
-            stiffness=20.0,
-            damping=0.5,
-        ), 
+        # "spine_neck": ImplicitActuatorCfg(
+        #     joint_names_expr=["spine_joint", "neck_joint"],
+        #     effort_limit=30.0,
+        #     velocity_limit=21.0,
+        #     stiffness=20.0,
+        #     damping=0.5,
+        # ), 
     },
 )
 """Configuration of Unitree A1 using DC motor.
