@@ -410,7 +410,7 @@ for _key, (_snake, _factory, _h_scale) in TERRAIN_SPECS.items():
     _runner_name = f"UnitreeA1{_key}PPORunnerCfg"
     _runner = type(
         _runner_name,
-        (UnitreeA1RoughPPORunnerCfg,),
+        (UnitreeA1ZRoughPPORunnerCfg,),
         {"__annotations__": {"experiment_name": str}, "experiment_name": f"unitree_a1_{_snake}", "__module__": __name__},
     )
     globals()[_runner_name] = configclass(_runner)
