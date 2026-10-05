@@ -119,7 +119,7 @@ Note: Specifications taken from: https://www.trossenrobotics.com/a1-quadruped#sp
 UNITREE_A1_DOG_CFG = clone(UNITREE_A1_CFG)
 UNITREE_A1_DOG_CFG.spawn.usd_path = os.environ.get(
     "ISAACLAB_A1_DOG_USD",
-    "/home/t-yajima/ドキュメント/dog1_neckjoint_massed_standanchor/dog1_neckjoint_massed_standanchor.usd",
+    "/home/t-yajima/ダウンロード/dog_2.3/dog_2.3.usd",
 )
 UNITREE_A1_DOG_CFG.init_state.joint_pos = {
     ".*L_hip_joint": 0.01,
@@ -147,7 +147,7 @@ drive defined in the USD). Override the asset location with the ``ISAACLAB_A1_DO
 UNITREE_A1_HORSE_CFG = clone(UNITREE_A1_CFG)
 UNITREE_A1_HORSE_CFG.spawn.usd_path = os.environ.get(
     "ISAACLAB_A1_HORSE_USD",
-    "/home/t-yajima/Downloads/horseID1nohead_fixed/horseID1nohead_fixed.usd",
+    "/home/t-yajima/ダウンロード/horse_2.3_vis/horse_2.3.usd",
 )
 UNITREE_A1_HORSE_CFG.init_state.joint_pos = {
     ".*L_hip_joint": 0.01,
@@ -162,7 +162,7 @@ UNITREE_A1_HORSE_CFG.init_state.joint_pos = {
 UNITREE_A1_HORSE_CFG.actuators["base_legs"].joint_names_expr = UNITREE_A1_DOG_CFG.actuators[
     "base_legs"
 ].joint_names_expr
-"""Configuration of the horse model (A1-based, single ``trunk``, ``calf2`` joints, no head).
+"""Configuration of the horse model (A1-based, same body layout as the dog: ``calf2`` joints, spine and neck).
 
 Override the asset location with the ``ISAACLAB_A1_HORSE_USD`` environment variable.
 """

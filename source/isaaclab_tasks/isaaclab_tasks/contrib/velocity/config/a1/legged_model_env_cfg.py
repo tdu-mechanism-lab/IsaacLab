@@ -6,10 +6,9 @@
 """Velocity-tracking environments for the A1-based dog and horse models.
 
 Both models have an extra ``calf2`` joint per leg (4 joints per leg). They share the Rough terrain setup of
-``UnitreeA1RoughEnvCfg`` and differ in the robot asset and in the body names used for contacts:
+``UnitreeA1RoughEnvCfg`` and differ in the robot asset and the default joint pose:
 
-* Dog (3-link): ``trunk_front`` / ``trunk_rear`` / ``head_neck`` bodies, spine and neck joints.
-* Horse: a single ``trunk`` body and no head.
+* Both use ``trunk_front`` / ``trunk_rear`` / ``head_neck`` bodies and spine and neck joints.
 """
 
 import math
@@ -142,26 +141,13 @@ class UnitreeA1DogRoughEnvCfg(UnitreeA1RoughEnvCfg):
 
 
 @configclass
-class UnitreeA1HorseRoughEnvCfg(UnitreeA1RoughEnvCfg):
-    """Horse: a single trunk body and no head."""
+class UnitreeA1HorseRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
+    """Horse: same body layout (front/rear trunk, head) and rewards as the dog, with its own asset and pose."""
 
     def __post_init__(self):
         super().__post_init__()
 
-        _apply_calf_model_cfg(
-            self,
-            UNITREE_A1_HORSE_CFG,
-            base_bodies="trunk",
-            base_contact_bodies="(trunk|.*(hip|thigh).*)",
-            undesired_contact_bodies=".*(trunk|HIP|THIGH|CALF)$",
-        )
-        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/trunk"
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = "trunk"
-        self.rewards.feet_clearance = RewTerm(
-            func=mdp.feet_clearance,
-            weight=0.1,
-            params={"asset_cfg": SceneEntityCfg("robot", body_names=".*_foot"), "target_height": 0.05},
-        )
+        self.scene.robot = replace(UNITREE_A1_HORSE_CFG, prim_path="{ENV_REGEX_NS}/Robot")
 
 
 @configclass
