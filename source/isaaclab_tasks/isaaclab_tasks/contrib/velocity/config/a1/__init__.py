@@ -36,6 +36,21 @@ gym.register(
 )
 
 ##
+# A1-based dog (3-link) and horse models, defined in legged_model_env_cfg.py.
+##
+
+for _model in ("Dog", "Horse"):
+    gym.register(
+        id=f"IsaacContrib-Velocity-Rough-UnitreeA1{_model}",
+        entry_point="isaaclab.envs:ManagerBasedRLEnv",
+        disable_env_checker=True,
+        kwargs={
+            "env_cfg_entry_point": f"{__name__}.legged_model_env_cfg:UnitreeA1{_model}RoughEnvCfg",
+            "rsl_rl_cfg_entry_point": f"{__name__}.legged_model_env_cfg:UnitreeA1{_model}PPORunnerCfg",
+        },
+    )
+
+##
 # Single-terrain environments, defined in eval_terrain_env_cfg.py (TERRAIN_SPECS).
 # Rewards etc. are inherited from UnitreeA1RoughEnvCfg.
 # Keep this list in sync with the keys of TERRAIN_SPECS. It is duplicated here on purpose:
