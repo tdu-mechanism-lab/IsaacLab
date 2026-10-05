@@ -21,8 +21,8 @@ Scale the ``*_range`` values up for larger morphologies (e.g. 0.4 m front leg le
 
 from collections.abc import Callable
 
-import isaaclab.terrains as terrain_gen
 import isaaclab.envs.mdp as mdp
+import isaaclab.terrains as terrain_gen
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.terrains import SubTerrainBaseCfg, TerrainGeneratorCfg
 from isaaclab.utils import configclass
@@ -256,9 +256,7 @@ def add_fall_termination(env_cfg) -> None:
     Terrain surfaces here stay above -0.5 m (stepping-stone holes) and the base sits ~0.3 m
     above the feet, so this term never fires on Rough or the other terrains.
     """
-    env_cfg.terminations.fell = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": -1.0}
-    )
+    env_cfg.terminations.fell = DoneTerm(func=mdp.root_height_below_minimum, params={"minimum_height": -1.0})
 
 
 ##
@@ -410,8 +408,12 @@ for _key, (_snake, _factory, _h_scale) in TERRAIN_SPECS.items():
     _runner_name = f"UnitreeA1{_key}PPORunnerCfg"
     _runner = type(
         _runner_name,
-        (UnitreeA1ZRoughPPORunnerCfg,),
-        {"__annotations__": {"experiment_name": str}, "experiment_name": f"unitree_a1_{_snake}", "__module__": __name__},
+        (UnitreeA1RoughPPORunnerCfg,),
+        {
+            "__annotations__": {"experiment_name": str},
+            "experiment_name": f"unitree_a1_{_snake}",
+            "__module__": __name__,
+        },
     )
     globals()[_runner_name] = configclass(_runner)
 

@@ -41,7 +41,7 @@ gym.register(
 # Keep this list in sync with the keys of TERRAIN_SPECS. It is duplicated here on purpose:
 # importing eval_terrain_env_cfg at registration time would pull in isaaclab.terrains.
 ##
- 
+
 _TERRAINS = (
     "Wave",
     "SteppingStones",
@@ -56,7 +56,7 @@ _TERRAINS = (
     "RepeatedBoxes",
     "RepeatedCylinders",
 )
- 
+
 for _terrain in _TERRAINS:
     for _mode in ("Train", "Eval"):
         gym.register(
@@ -68,7 +68,7 @@ for _terrain in _TERRAINS:
                 "rsl_rl_cfg_entry_point": f"{__name__}.eval_terrain_env_cfg:UnitreeA1{_terrain}PPORunnerCfg",
             },
         )
- 
+
 # All terrains at once (6 Rough sub-terrains + the 12 above), for training a single generalist policy.
 gym.register(
     id="IsaacContrib-Velocity-AllTerrainsTrain-UnitreeA1",
@@ -79,4 +79,3 @@ gym.register(
         "rsl_rl_cfg_entry_point": f"{__name__}.eval_terrain_env_cfg:UnitreeA1AllTerrainsPPORunnerCfg",
     },
 )
- 
