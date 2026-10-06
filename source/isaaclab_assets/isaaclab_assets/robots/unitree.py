@@ -149,16 +149,11 @@ UNITREE_A1_HORSE_CFG.spawn.usd_path = os.environ.get(
     "ISAACLAB_A1_HORSE_USD",
     "/home/t-yajima/ダウンロード/horse_2.3_vis/horse_2.3.usd",
 )
-UNITREE_A1_HORSE_CFG.init_state.joint_pos = {
-    ".*L_hip_joint": 0.01,
-    ".*R_hip_joint": -0.01,
-    "F[L,R]_thigh_joint": 0.326,
-    "R[L,R]_thigh_joint": 0.199,
-    "F[L,R]_calf_joint": -0.312,
-    "R[L,R]_calf_joint": 0.680,
-    "F[L,R]_calf2_joint": -0.256,
-    "R[L,R]_calf2_joint": -0.652,
-}
+# The horse is trained from the same default pose as the dog. The pose originally used for the horse is:
+# {".*L_hip_joint": 0.01, ".*R_hip_joint": -0.01, "F[L,R]_thigh_joint": 0.326, "R[L,R]_thigh_joint": 0.199,
+#  "F[L,R]_calf_joint": -0.312, "R[L,R]_calf_joint": 0.680, "F[L,R]_calf2_joint": -0.256,
+#  "R[L,R]_calf2_joint": -0.652}
+UNITREE_A1_HORSE_CFG.init_state.joint_pos = dict(UNITREE_A1_DOG_CFG.init_state.joint_pos)
 UNITREE_A1_HORSE_CFG.actuators["base_legs"].joint_names_expr = UNITREE_A1_DOG_CFG.actuators[
     "base_legs"
 ].joint_names_expr
