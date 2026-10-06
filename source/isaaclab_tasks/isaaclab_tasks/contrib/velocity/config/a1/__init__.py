@@ -94,3 +94,64 @@ gym.register(
         "rsl_rl_cfg_entry_point": f"{__name__}.eval_terrain_env_cfg:UnitreeA1AllTerrainsPPORunnerCfg",
     },
 )
+
+##
+# Custom (user-defined) terrains, defined in custom_terrain_env_cfg.py / custom_terrains.py.
+##
+
+gym.register(
+    id="IsaacContrib-Velocity-CustomTerrainsTrain-UnitreeA1",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.custom_terrain_env_cfg:UnitreeA1CustomTerrainsTrainEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{__name__}.custom_terrain_env_cfg:UnitreeA1CustomTerrainsPPORunnerCfg",
+    },
+)
+gym.register(
+    id="IsaacContrib-Velocity-CustomTerrainsEval-UnitreeA1",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.custom_terrain_env_cfg:UnitreeA1CustomTerrainsEvalEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{__name__}.custom_terrain_env_cfg:UnitreeA1CustomTerrainsPPORunnerCfg",
+    },
+)
+
+##
+# Non-terrain conditions (payload, push, low friction), defined in conditions_env_cfg.py / conditions.py.
+# Keep the preset list in sync with CONDITION_PRESETS. It is duplicated here on purpose: importing
+# conditions_env_cfg at registration time would pull in isaaclab.terrains.
+##
+
+gym.register(
+    id="IsaacContrib-Velocity-ConditionsTrain-UnitreeA1",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.conditions_env_cfg:UnitreeA1ConditionsTrainEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{__name__}.conditions_env_cfg:UnitreeA1ConditionsPPORunnerCfg",
+    },
+)
+
+_CONDITION_EVALS = (
+    "Baseline",
+    "Friction08",
+    "Friction06",
+    "Friction04",
+    "Friction02",
+    "Payload",
+    "PushLateral",
+    "PushBackward",
+)
+
+for _condition in _CONDITION_EVALS:
+    gym.register(
+        id=f"IsaacContrib-Velocity-Cond{_condition}Eval-UnitreeA1",
+        entry_point="isaaclab.envs:ManagerBasedRLEnv",
+        disable_env_checker=True,
+        kwargs={
+            "env_cfg_entry_point": f"{__name__}.conditions_env_cfg:UnitreeA1Cond{_condition}EvalEnvCfg",
+            "rsl_rl_cfg_entry_point": f"{__name__}.conditions_env_cfg:UnitreeA1ConditionsPPORunnerCfg",
+        },
+    )
