@@ -155,3 +155,31 @@ for _condition in _CONDITION_EVALS:
             "rsl_rl_cfg_entry_point": f"{__name__}.conditions_env_cfg:UnitreeA1ConditionsPPORunnerCfg",
         },
     )
+
+##
+# Single-terrain / single-condition training environments, defined in split_env_cfg.py.
+# Keep these lists in sync with ROUGH_TERRAINS, CUSTOM_TERRAINS and CONDITIONS of split_env_cfg.py. They are
+# duplicated here on purpose: importing split_env_cfg at registration time would pull in isaaclab.terrains.
+##
+
+for _prefix, _names in (
+    ("Rough", ("PyramidStairs", "PyramidStairsInv", "Boxes", "RandomRough", "HfPyramidSlope", "HfPyramidSlopeInv")),
+    (
+        "Custom",
+        ("SlopeUp", "SlopeDown", "StepUp", "StepDown", "Corrugation", "CrossSlope", "RoughRms", "Gap", "Beam"),
+    ),
+    (
+        "Cond",
+        ("Payload", "PushLateral", "PushBackward", "Friction08", "Friction06", "Friction04", "Friction02"),
+    ),
+):
+    for _name in _names:
+        gym.register(
+            id=f"IsaacContrib-Velocity-{_prefix}{_name}Train-UnitreeA1",
+            entry_point="isaaclab.envs:ManagerBasedRLEnv",
+            disable_env_checker=True,
+            kwargs={
+                "env_cfg_entry_point": f"{__name__}.split_env_cfg:UnitreeA1{_prefix}{_name}TrainEnvCfg",
+                "rsl_rl_cfg_entry_point": f"{__name__}.split_env_cfg:UnitreeA1{_prefix}{_name}PPORunnerCfg",
+            },
+        )
