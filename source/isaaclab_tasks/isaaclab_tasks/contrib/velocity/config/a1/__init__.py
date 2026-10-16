@@ -183,3 +183,17 @@ for _prefix, _names in (
                 "rsl_rl_cfg_entry_point": f"{__name__}.split_env_cfg:UnitreeA1{_prefix}{_name}PPORunnerCfg",
             },
         )
+
+##
+# Movable stones, defined in stones_env_cfg.py / stones.py.
+##
+
+gym.register(
+    id="IsaacContrib-Velocity-StonesTrain-UnitreeA1",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.stones_env_cfg:UnitreeA1StonesTrainEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{__name__}.stones_env_cfg:UnitreeA1StonesPPORunnerCfg",
+    },
+)
