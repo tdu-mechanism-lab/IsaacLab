@@ -18,7 +18,12 @@ from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass, replace
 
-from isaaclab_assets.robots.unitree import UNITREE_A1_DOG_CFG, UNITREE_A1_HORSE_CFG  # isort: skip
+from isaaclab_assets.robots.unitree import (  # isort: skip
+    UNITREE_A1_DOG_CFG,
+    UNITREE_A1_DOG_NOHEAD_CFG,
+    UNITREE_A1_HORSE_CFG,
+    UNITREE_A1_HORSE_NOHEAD_CFG,
+)
 
 from . import mdp
 from .agents.rsl_rl_ppo_cfg import UnitreeA1RoughPPORunnerCfg
@@ -150,6 +155,39 @@ class UnitreeA1HorseRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
         self.scene.robot = replace(UNITREE_A1_HORSE_CFG, prim_path="{ENV_REGEX_NS}/Robot")
 
 
+def _apply_nohead(cfg: UnitreeA1RoughEnvCfg, robot_cfg) -> None:
+    """Switch a dog configuration to a headless model: a single ``trunk`` body instead of front/rear/head bodies.
+
+    The URDF-converted asset nests the bodies under ``Geometry/base_link``.
+    """
+    cfg.scene.robot = replace(robot_cfg, prim_path="{ENV_REGEX_NS}/Robot")
+    cfg.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base_link/trunk"
+    cfg.events.add_base_mass.params["asset_cfg"].body_names = "trunk"
+    cfg.events.base_external_force_torque.params["asset_cfg"].body_names = "trunk"
+    cfg.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk|.*(hip|thigh|calf(?!2)).*)"
+    cfg.rewards.undesired_contacts.params["sensor_cfg"].body_names = ".*(trunk|HIP|THIGH|CALF)$"
+
+
+@configclass
+class UnitreeA1DogNoheadRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
+    """Headless dog (URDF-converted USD): a single ``trunk`` body, 16 leg joints."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_nohead(self, UNITREE_A1_DOG_NOHEAD_CFG)
+
+
+@configclass
+class UnitreeA1HorseNoheadRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
+    """Headless horse (URDF-converted USD): same layout and rewards as the headless dog, with the horse pose."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_nohead(self, UNITREE_A1_HORSE_NOHEAD_CFG)
+
+
 @configclass
 class UnitreeA1DogPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
     experiment_name = "unitree_a1_dog"
@@ -158,3 +196,13 @@ class UnitreeA1DogPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
 @configclass
 class UnitreeA1HorsePPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
     experiment_name = "unitree_a1_horse"
+
+
+@configclass
+class UnitreeA1DogNoheadPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
+    experiment_name = "unitree_a1_dog_nohead"
+
+
+@configclass
+class UnitreeA1HorseNoheadPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
+    experiment_name = "unitree_a1_horse_nohead"

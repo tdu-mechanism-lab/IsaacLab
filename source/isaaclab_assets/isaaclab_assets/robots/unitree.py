@@ -10,6 +10,7 @@ The following configurations are available:
 * :obj:`UNITREE_A1_CFG`: Unitree A1 robot with DC motor model for the legs
 * :obj:`UNITREE_A1_DOG_CFG`: 3-link dog model based on A1 (custom USD)
 * :obj:`UNITREE_A1_HORSE_CFG`: horse model based on A1 (custom USD)
+* :obj:`UNITREE_A1_DOG_NOHEAD_CFG`, :obj:`UNITREE_A1_HORSE_NOHEAD_CFG`: headless dog and horse (URDF-converted USD)
 * :obj:`UNITREE_GO1_CFG`: Unitree Go1 robot with actuator net model for the legs
 * :obj:`UNITREE_GO2_CFG`: Unitree Go2 robot with DC motor model for the legs
 * :obj:`H1_CFG`: H1 humanoid robot
@@ -160,6 +161,53 @@ UNITREE_A1_HORSE_CFG.actuators["base_legs"].joint_names_expr = UNITREE_A1_DOG_CF
 """Configuration of the horse model (A1-based, same body layout as the dog: ``calf2`` joints, spine and neck).
 
 Override the asset location with the ``ISAACLAB_A1_HORSE_USD`` environment variable.
+"""
+
+
+UNITREE_A1_DOG_NOHEAD_CFG = clone(UNITREE_A1_DOG_CFG)
+UNITREE_A1_DOG_NOHEAD_CFG.spawn.usd_path = os.environ.get(
+    "ISAACLAB_A1_DOG_NOHEAD_USD",
+    "/home/t-yajima/ダウンロード/dog_nohead_vis/dog_nohead_vis_fixed.usda",
+)
+UNITREE_A1_DOG_NOHEAD_CFG.spawn.variants = {"Physics": "physx"}
+# The rear calf and calf2 joints of this model have narrower limits ([-0.60, 0.38] and [-0.51, 0.55] rad) than the
+# pose of the headed dog (R_calf 0.606, R_calf2 -0.836), so these two are moved inside their (soft) limits.
+UNITREE_A1_DOG_NOHEAD_CFG.init_state.joint_pos = {
+    **UNITREE_A1_DOG_CFG.init_state.joint_pos,
+    "R[L,R]_calf_joint": 0.32,
+    "R[L,R]_calf2_joint": -0.45,
+}
+"""Dog model without a head, converted from URDF (a single ``trunk`` body, 16 leg joints, no spine or neck joint).
+
+The asset keeps its physics behind a ``Physics`` variant set with no default selection, so the ``physx`` variant is
+selected here. The converted file has two problems that blow the simulation up at the first step: the root link
+``base_link`` has no mass (PhysX reports an invalid inertia and a negative mass), and the importer writes a
+``root_joint`` fixed to the world whose body reference breaks when the environments are cloned. The asset used
+here is therefore ``dog_nohead_vis_fixed.usda``, a wrapper that references the converted file, gives ``base_link``
+a small valid mass and inertia, and deactivates ``root_joint`` to get a floating base.
+Override the asset location with the ``ISAACLAB_A1_DOG_NOHEAD_USD`` environment variable.
+"""
+
+UNITREE_A1_HORSE_NOHEAD_CFG = clone(UNITREE_A1_DOG_NOHEAD_CFG)
+UNITREE_A1_HORSE_NOHEAD_CFG.spawn.usd_path = os.environ.get(
+    "ISAACLAB_A1_HORSE_NOHEAD_USD",
+    "/home/t-yajima/ダウンロード/horse_nohead_vis/horse_nohead_vis_fixed.usda",
+)
+UNITREE_A1_HORSE_NOHEAD_CFG.init_state.joint_pos = {
+    ".*L_hip_joint": 0.01,
+    ".*R_hip_joint": -0.01,
+    "F[L,R]_thigh_joint": 0.326,
+    "R[L,R]_thigh_joint": 0.199,
+    "F[L,R]_calf_joint": -0.312,
+    "R[L,R]_calf_joint": 0.680,
+    "F[L,R]_calf2_joint": -0.256,
+    "R[L,R]_calf2_joint": -0.652,
+}
+"""Horse model without a head, converted from URDF.
+
+Same layout as :obj:`UNITREE_A1_DOG_NOHEAD_CFG`, with the horse pose.
+
+Override the asset location with the ``ISAACLAB_A1_HORSE_NOHEAD_USD`` environment variable.
 """
 
 
