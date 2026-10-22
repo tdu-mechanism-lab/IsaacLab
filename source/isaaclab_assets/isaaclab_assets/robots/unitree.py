@@ -177,6 +177,9 @@ UNITREE_A1_DOG_NOHEAD_CFG.init_state.joint_pos = {
     "R[L,R]_calf_joint": 0.32,
     "R[L,R]_calf2_joint": -0.45,
 }
+# In this pose the trunk stands 0.46 m above the feet, so spawning at the A1 height of 0.42 m starts the feet 4 cm
+# inside the ground and the contact kicks the robot upwards. Spawn above the standing height instead.
+UNITREE_A1_DOG_NOHEAD_CFG.init_state.pos = (0.0, 0.0, 0.50)
 """Dog model without a head, converted from URDF (a single ``trunk`` body, 16 leg joints, no spine or neck joint).
 
 The asset keeps its physics behind a ``Physics`` variant set with no default selection, so the ``physx`` variant is
@@ -203,6 +206,7 @@ UNITREE_A1_HORSE_NOHEAD_CFG.init_state.joint_pos = {
     "F[L,R]_calf2_joint": -0.256,
     "R[L,R]_calf2_joint": -0.652,
 }
+UNITREE_A1_HORSE_NOHEAD_CFG.init_state.pos = (0.0, 0.0, 0.45)
 """Horse model without a head, converted from URDF.
 
 Same layout as :obj:`UNITREE_A1_DOG_NOHEAD_CFG`, with the horse pose.

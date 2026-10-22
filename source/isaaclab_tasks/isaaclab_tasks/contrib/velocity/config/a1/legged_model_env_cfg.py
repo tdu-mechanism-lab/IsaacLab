@@ -202,7 +202,21 @@ class UnitreeA1HorsePPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
 class UnitreeA1DogNoheadPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
     experiment_name = "unitree_a1_dog_nohead"
 
+    def __post_init__(self):
+        super().__post_init__()
+
+        # a learned scalar std can turn negative and abort the run ("normal expects all elements of std >= 0.0"),
+        # which happened to the horse after 1265 iterations; the log parameterization cannot
+        self.actor.distribution_cfg.std_type = "log"
+
 
 @configclass
 class UnitreeA1HorseNoheadPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
     experiment_name = "unitree_a1_horse_nohead"
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        # a learned scalar std can turn negative and abort the run ("normal expects all elements of std >= 0.0"),
+        # which happened to the horse after 1265 iterations; the log parameterization cannot
+        self.actor.distribution_cfg.std_type = "log"
