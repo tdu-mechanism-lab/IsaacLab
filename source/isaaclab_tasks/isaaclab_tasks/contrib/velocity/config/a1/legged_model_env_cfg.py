@@ -20,6 +20,7 @@ from isaaclab.utils import configclass, replace
 
 from isaaclab_assets.robots.unitree import (  # isort: skip
     UNITREE_A1_DOG_CFG,
+    UNITREE_A1_DOG_LINK3_CFG,
     UNITREE_A1_DOG_NOHEAD_CFG,
     UNITREE_A1_DOG_VIS_CFG,
     UNITREE_A1_HORSE_CFG,
@@ -211,6 +212,46 @@ class UnitreeA1HorseVisRoughEnvCfg(UnitreeA1DogVisRoughEnvCfg):
         self.scene.robot = replace(UNITREE_A1_HORSE_VIS_CFG, prim_path="{ENV_REGEX_NS}/Robot")
 
 
+def _apply_link3_settings(cfg: UnitreeA1RoughEnvCfg, dog: bool) -> None:
+    """Match the termination and reward settings of the 3-link policies that learned to walk (``params/env.yaml``).
+
+    Compared with the other headless tasks: the episode ends only on a trunk, hip or thigh contact (not on a calf
+    contact), ``feet_air_time`` uses a 0.5 s threshold, and the dog also rewards the ``calf2`` joint motion while the
+    horse has no foot-clearance term.
+    """
+    cfg.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk|.*(hip|thigh).*)"
+    cfg.rewards.feet_air_time.params["threshold"] = 0.5
+    if dog:
+        cfg.rewards.calf2_joint_motion = RewTerm(
+            func=mdp.calf2_joint_motion,
+            weight=0.2,
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_calf2_joint")},
+        )
+    else:
+        cfg.rewards.feet_clearance = None
+
+
+@configclass
+class UnitreeA1DogLink3RoughEnvCfg(UnitreeA1DogVisRoughEnvCfg):
+    """Headless dog set up like the 3-link training run: its default pose, terminations and rewards."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        self.scene.robot = replace(UNITREE_A1_DOG_LINK3_CFG, prim_path="{ENV_REGEX_NS}/Robot")
+        _apply_link3_settings(self, dog=True)
+
+
+@configclass
+class UnitreeA1HorseLink3RoughEnvCfg(UnitreeA1HorseVisRoughEnvCfg):
+    """Headless horse set up like the 3-link training run: its terminations and rewards."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_link3_settings(self, dog=False)
+
+
 @configclass
 class UnitreeA1DogPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
     experiment_name = "unitree_a1_dog"
@@ -253,3 +294,13 @@ class UnitreeA1DogVisPPORunnerCfg(UnitreeA1DogNoheadPPORunnerCfg):
 @configclass
 class UnitreeA1HorseVisPPORunnerCfg(UnitreeA1HorseNoheadPPORunnerCfg):
     experiment_name = "unitree_a1_horse_vis"
+
+
+@configclass
+class UnitreeA1DogLink3PPORunnerCfg(UnitreeA1DogNoheadPPORunnerCfg):
+    experiment_name = "unitree_a1_dog_link3"
+
+
+@configclass
+class UnitreeA1HorseLink3PPORunnerCfg(UnitreeA1HorseNoheadPPORunnerCfg):
+    experiment_name = "unitree_a1_horse_link3"

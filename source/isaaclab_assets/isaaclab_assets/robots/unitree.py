@@ -246,6 +246,25 @@ Uses the horse pose and the (horse) joint limits of the model. Override the asse
 """
 
 
+UNITREE_A1_DOG_LINK3_CFG = clone(UNITREE_A1_DOG_VIS_CFG)
+UNITREE_A1_DOG_LINK3_CFG.init_state.joint_pos = {
+    ".*L_hip_joint": 0.01,
+    ".*R_hip_joint": -0.01,
+    "F[L,R]_thigh_joint": 0.326,
+    "R[L,R]_thigh_joint": 0.199,
+    "F[L,R]_calf_joint": -0.312,
+    "R[L,R]_calf_joint": 0.3,
+    "F[L,R]_calf2_joint": -0.256,
+    "R[L,R]_calf2_joint": -0.4,
+}
+UNITREE_A1_DOG_LINK3_CFG.init_state.pos = (0.0, 0.0, 0.45)
+"""Headless dog with the default pose that the 3-link branch used for the policy that learned to walk.
+
+Read from the ``params/env.yaml`` saved with those checkpoints: the horse pose, except for the rear calf joints
+(0.3 and -0.4 rad), which are inside the narrow limits of the dog. Spawned at 0.45 m instead of 0.42 m.
+"""
+
+
 UNITREE_GO1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Robots/Unitree/Go1/go1.usd",
