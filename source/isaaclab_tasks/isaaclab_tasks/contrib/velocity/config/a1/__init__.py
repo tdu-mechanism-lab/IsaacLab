@@ -39,7 +39,7 @@ gym.register(
 # A1-based dog (3-link) and horse models, defined in legged_model_env_cfg.py.
 ##
 
-for _model in ("Dog", "Horse", "DogNohead", "HorseNohead"):
+for _model in ("Dog", "Horse", "DogNohead", "HorseNohead", "DogVis", "HorseVis"):
     gym.register(
         id=f"IsaacContrib-Velocity-Rough-UnitreeA1{_model}",
         entry_point="isaaclab.envs:ManagerBasedRLEnv",

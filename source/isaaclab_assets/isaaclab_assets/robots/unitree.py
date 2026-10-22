@@ -11,6 +11,8 @@ The following configurations are available:
 * :obj:`UNITREE_A1_DOG_CFG`: 3-link dog model based on A1 (custom USD)
 * :obj:`UNITREE_A1_HORSE_CFG`: horse model based on A1 (custom USD)
 * :obj:`UNITREE_A1_DOG_NOHEAD_CFG`, :obj:`UNITREE_A1_HORSE_NOHEAD_CFG`: headless dog and horse (URDF-converted USD)
+* :obj:`UNITREE_A1_DOG_VIS_CFG`, :obj:`UNITREE_A1_HORSE_VIS_CFG`: dog and horse of the 3-link branch
+  (Isaac Sim 5.1 USD format)
 * :obj:`UNITREE_GO1_CFG`: Unitree Go1 robot with actuator net model for the legs
 * :obj:`UNITREE_GO2_CFG`: Unitree Go2 robot with DC motor model for the legs
 * :obj:`H1_CFG`: H1 humanoid robot
@@ -212,6 +214,31 @@ UNITREE_A1_HORSE_NOHEAD_CFG.init_state.pos = (0.0, 0.0, 0.45)
 Same layout as :obj:`UNITREE_A1_DOG_NOHEAD_CFG`, with the horse pose.
 
 Override the asset location with the ``ISAACLAB_A1_HORSE_NOHEAD_USD`` environment variable.
+"""
+
+
+UNITREE_A1_DOG_VIS_CFG = clone(UNITREE_A1_DOG_CFG)
+UNITREE_A1_DOG_VIS_CFG.spawn.usd_path = os.environ.get(
+    "ISAACLAB_A1_DOG_VIS_USD", "/home/t-yajima/ダウンロード/dog_vis/dog_vis.usd"
+)
+UNITREE_A1_DOG_VIS_CFG.init_state.joint_pos = dict(UNITREE_A1_DOG_NOHEAD_CFG.init_state.joint_pos)
+UNITREE_A1_DOG_VIS_CFG.init_state.pos = (0.0, 0.0, 0.50)
+"""Headless dog (a single ``trunk`` body) in the Isaac Sim 5.1 USD format used on the 3-link branch.
+
+Same geometry, masses and joint limits as :obj:`UNITREE_A1_DOG_NOHEAD_CFG`, but this file authors a joint velocity limit
+(21 rad/s), a joint friction and a massive root link, and has no world-fixed root joint. The pose is the one of
+:obj:`UNITREE_A1_DOG_NOHEAD_CFG`, whose rear calf joints are inside the (narrow) limits of the model.
+"""
+
+UNITREE_A1_HORSE_VIS_CFG = clone(UNITREE_A1_HORSE_CFG)
+UNITREE_A1_HORSE_VIS_CFG.spawn.usd_path = os.environ.get(
+    "ISAACLAB_A1_HORSE_VIS_USD", "/home/t-yajima/ダウンロード/horse_kubo_v2_vis/horse_kubo_v2_vis.usd"
+)
+UNITREE_A1_HORSE_VIS_CFG.init_state.joint_pos = dict(UNITREE_A1_HORSE_NOHEAD_CFG.init_state.joint_pos)
+UNITREE_A1_HORSE_VIS_CFG.init_state.pos = (0.0, 0.0, 0.45)
+"""Horse with a front and a rear trunk, a head, and spine and neck joints (Isaac Sim 5.1 USD format, 3-link branch).
+
+Uses the horse pose (the headless horse pose) instead of the dog pose of :obj:`UNITREE_A1_HORSE_CFG`.
 """
 
 

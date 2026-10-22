@@ -21,8 +21,10 @@ from isaaclab.utils import configclass, replace
 from isaaclab_assets.robots.unitree import (  # isort: skip
     UNITREE_A1_DOG_CFG,
     UNITREE_A1_DOG_NOHEAD_CFG,
+    UNITREE_A1_DOG_VIS_CFG,
     UNITREE_A1_HORSE_CFG,
     UNITREE_A1_HORSE_NOHEAD_CFG,
+    UNITREE_A1_HORSE_VIS_CFG,
 )
 
 from . import mdp
@@ -189,6 +191,27 @@ class UnitreeA1HorseNoheadRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
 
 
 @configclass
+class UnitreeA1DogVisRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
+    """Headless dog of the 3-link branch (Isaac Sim 5.1 USD format): a single ``trunk`` body in a flat hierarchy."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_nohead(self, UNITREE_A1_DOG_VIS_CFG)
+        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/trunk"
+
+
+@configclass
+class UnitreeA1HorseVisRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
+    """Horse of the 3-link branch (front and rear trunk, head): same layout and rewards as the headed dog."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        self.scene.robot = replace(UNITREE_A1_HORSE_VIS_CFG, prim_path="{ENV_REGEX_NS}/Robot")
+
+
+@configclass
 class UnitreeA1DogPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
     experiment_name = "unitree_a1_dog"
 
@@ -220,3 +243,13 @@ class UnitreeA1HorseNoheadPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
         # a learned scalar std can turn negative and abort the run ("normal expects all elements of std >= 0.0"),
         # which happened to the horse after 1265 iterations; the log parameterization cannot
         self.actor.distribution_cfg.std_type = "log"
+
+
+@configclass
+class UnitreeA1DogVisPPORunnerCfg(UnitreeA1DogNoheadPPORunnerCfg):
+    experiment_name = "unitree_a1_dog_vis"
+
+
+@configclass
+class UnitreeA1HorseVisPPORunnerCfg(UnitreeA1HorseNoheadPPORunnerCfg):
+    experiment_name = "unitree_a1_horse_vis"
