@@ -202,8 +202,8 @@ class UnitreeA1DogVisRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
 
 
 @configclass
-class UnitreeA1HorseVisRoughEnvCfg(UnitreeA1DogRoughEnvCfg):
-    """Horse of the 3-link branch (front and rear trunk, head): same layout and rewards as the headed dog."""
+class UnitreeA1HorseVisRoughEnvCfg(UnitreeA1DogVisRoughEnvCfg):
+    """Headless horse in the 3-link USD format: the same layout and rewards as the headless dog."""
 
     def __post_init__(self):
         super().__post_init__()
