@@ -169,6 +169,8 @@ def _apply_nohead(cfg: UnitreeA1RoughEnvCfg, robot_cfg) -> None:
     cfg.events.base_external_force_torque.params["asset_cfg"].body_names = "trunk"
     cfg.terminations.base_contact.params["sensor_cfg"].body_names = "(trunk|.*(hip|thigh|calf(?!2)).*)"
     cfg.rewards.undesired_contacts.params["sensor_cfg"].body_names = ".*(trunk|HIP|THIGH|CALF)$"
+    # the 3-link runs that learned to walk used the default 0.5 s air-time threshold
+    cfg.rewards.feet_air_time.params["threshold"] = 0.5
 
 
 @configclass
