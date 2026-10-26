@@ -6,5 +6,12 @@
 """MDP terms specific to the A1-based dog and horse models."""
 
 from .rewards import calf2_joint_motion, feet_clearance, feet_clearance_swing, joint_torques_weighted
+from .terminations import physics_diverged
 
-__all__ = ["calf2_joint_motion", "feet_clearance", "feet_clearance_swing", "joint_torques_weighted"]
+__all__ = [
+    "calf2_joint_motion",
+    "feet_clearance",
+    "feet_clearance_swing",
+    "joint_torques_weighted",
+    "physics_diverged",
+]

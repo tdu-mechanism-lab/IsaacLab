@@ -50,6 +50,18 @@ for _model in ("Dog", "Horse", "DogNohead", "HorseNohead", "DogVis", "HorseVis",
         },
     )
 
+# headless models with the stability guards, registered with the environment class that sanitizes the step outputs
+for _model in ("DogNoheadStable", "HorseNoheadStable"):
+    gym.register(
+        id=f"IsaacContrib-Velocity-Rough-UnitreeA1{_model}",
+        entry_point=f"{__name__}.sanitized_env:SanitizedManagerBasedRLEnv",
+        disable_env_checker=True,
+        kwargs={
+            "env_cfg_entry_point": f"{__name__}.legged_model_env_cfg:UnitreeA1{_model}RoughEnvCfg",
+            "rsl_rl_cfg_entry_point": f"{__name__}.legged_model_env_cfg:UnitreeA1{_model}PPORunnerCfg",
+        },
+    )
+
 ##
 # Single-terrain environments, defined in eval_terrain_env_cfg.py (TERRAIN_SPECS).
 # Rewards etc. are inherited from UnitreeA1RoughEnvCfg.

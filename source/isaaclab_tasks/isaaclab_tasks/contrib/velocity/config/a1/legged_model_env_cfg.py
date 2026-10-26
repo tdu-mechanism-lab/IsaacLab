@@ -14,8 +14,10 @@ Both models have an extra ``calf2`` joint per leg (4 joints per leg). They share
 import math
 
 from isaaclab.envs.mdp import undesired_contacts
+from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
+from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.utils import configclass, replace
 
 from isaaclab_assets.robots.unitree import (  # isort: skip
@@ -254,6 +256,63 @@ class UnitreeA1HorseLink3RoughEnvCfg(UnitreeA1HorseVisRoughEnvCfg):
         _apply_link3_settings(self, dog=False)
 
 
+def _apply_stable_settings(cfg: UnitreeA1RoughEnvCfg, dog: bool) -> None:
+    """Guard the headless tasks against the simulation blow-ups that aborted the 15k runs, and match the 3-link run.
+
+    Stability:
+
+    * A solver joint velocity limit of 21 rad/s (the motor limit, which the 3-link USDs author but the URDF-converted
+      ones do not).
+    * A ``physics_diverged`` termination that resets an environment with a non-finite or unphysically fast state.
+    * Clipped observations; the step rewards and observations are also sanitized by
+      :class:`SanitizedManagerBasedRLEnv`, which these tasks are registered with.
+
+    3-link settings: the terminations and rewards of :func:`_apply_link3_settings` and the base-mass randomization of
+    the 3-link run (add -1 to 3 kg instead of scaling by 0.8 to 1.25).
+    """
+    cfg.scene.robot.actuators["base_legs"].joint_velocity_limit = 21.0
+    cfg.terminations.physics_diverged = DoneTerm(func=mdp.physics_diverged)
+    for term in vars(cfg.observations.policy).values():
+        if isinstance(term, ObsTerm) and term.clip is None:
+            term.clip = (-100.0, 100.0)
+    _apply_link3_settings(cfg, dog=dog)
+    cfg.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
+    cfg.events.add_base_mass.params["operation"] = "add"
+    cfg.events.add_base_mass.params["distribution"] = "uniform"
+
+
+@configclass
+class UnitreeA1DogNoheadStableRoughEnvCfg(UnitreeA1DogNoheadRoughEnvCfg):
+    """Headless dog with the stability guards and the 3-link settings, including the 3-link training pose."""
+
+    step_reward_clip: float = 5.0
+    """Bound of the step reward, applied by :class:`SanitizedManagerBasedRLEnv`."""
+    step_obs_clip: float = 1.0e3
+    """Bound of the observations, applied by :class:`SanitizedManagerBasedRLEnv`."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_stable_settings(self, dog=True)
+        # the pose the 3-link dog was trained with; it is inside the joint limits of this model
+        self.scene.robot.init_state.joint_pos = dict(UNITREE_A1_DOG_LINK3_CFG.init_state.joint_pos)
+
+
+@configclass
+class UnitreeA1HorseNoheadStableRoughEnvCfg(UnitreeA1HorseNoheadRoughEnvCfg):
+    """Headless horse with the stability guards and the 3-link settings."""
+
+    step_reward_clip: float = 5.0
+    """Bound of the step reward, applied by :class:`SanitizedManagerBasedRLEnv`."""
+    step_obs_clip: float = 1.0e3
+    """Bound of the observations, applied by :class:`SanitizedManagerBasedRLEnv`."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_stable_settings(self, dog=False)
+
+
 @configclass
 class UnitreeA1DogPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
     experiment_name = "unitree_a1_dog"
@@ -306,3 +365,17 @@ class UnitreeA1DogLink3PPORunnerCfg(UnitreeA1DogNoheadPPORunnerCfg):
 @configclass
 class UnitreeA1HorseLink3PPORunnerCfg(UnitreeA1HorseNoheadPPORunnerCfg):
     experiment_name = "unitree_a1_horse_link3"
+
+
+@configclass
+class UnitreeA1DogNoheadStablePPORunnerCfg(UnitreeA1DogNoheadPPORunnerCfg):
+    experiment_name = "unitree_a1_dog_nohead_stable"
+    # joint targets are default + 0.25 * action, so 10 already covers more than the joint range
+    clip_actions = 10.0
+
+
+@configclass
+class UnitreeA1HorseNoheadStablePPORunnerCfg(UnitreeA1HorseNoheadPPORunnerCfg):
+    experiment_name = "unitree_a1_horse_nohead_stable"
+    # joint targets are default + 0.25 * action, so 10 already covers more than the joint range
+    clip_actions = 10.0
