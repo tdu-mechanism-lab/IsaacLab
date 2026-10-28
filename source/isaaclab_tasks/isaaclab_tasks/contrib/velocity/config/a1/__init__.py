@@ -51,7 +51,7 @@ for _model in ("Dog", "Horse", "DogNohead", "HorseNohead", "DogVis", "HorseVis",
     )
 
 # headless models with the stability guards, registered with the environment class that sanitizes the step outputs
-for _model in ("DogNoheadStable", "HorseNoheadStable"):
+for _model in ("DogNoheadStable", "HorseNoheadStable", "DogNoheadLimits", "HorseNoheadLimits"):
     gym.register(
         id=f"IsaacContrib-Velocity-Rough-UnitreeA1{_model}",
         entry_point=f"{__name__}.sanitized_env:SanitizedManagerBasedRLEnv",

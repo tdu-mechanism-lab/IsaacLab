@@ -20,6 +20,8 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.utils import configclass, replace
 
+from isaaclab_rl.rsl_rl import RslRlMLPModelCfg
+
 from isaaclab_assets.robots.unitree import (  # isort: skip
     UNITREE_A1_DOG_CFG,
     UNITREE_A1_DOG_LINK3_CFG,
@@ -313,6 +315,51 @@ class UnitreeA1HorseNoheadStableRoughEnvCfg(UnitreeA1HorseNoheadRoughEnvCfg):
         _apply_stable_settings(self, dog=False)
 
 
+def _apply_limit_settings(cfg: UnitreeA1RoughEnvCfg, dog: bool) -> None:
+    """Enforce the joint limits of the 4-joint legs and remove the reward the dog exploited.
+
+    With the 4 position iterations of the A1, PhysX does not hold the joint limits of these legs (four light links
+    under a heavy trunk): under load the calf joints pass their limits by 2 to 4 rad and the thigh and calf2 joints
+    by up to 1 rad. 16 iterations keep them within 0.05 rad. The 3-link USDs author 32.
+
+    The dog stood still and vibrated its front ``calf2`` joints at the 21 rad/s velocity limit to collect the
+    ``calf2_joint_motion`` reward, so the term is removed.
+    """
+    for props in cfg.scene.robot.spawn.articulation_props:
+        if hasattr(props, "solver_position_iteration_count"):
+            props.solver_position_iteration_count = 16
+    if dog:
+        cfg.rewards.calf2_joint_motion = None
+
+
+@configclass
+class UnitreeA1DogNoheadLimitsRoughEnvCfg(UnitreeA1DogNoheadStableRoughEnvCfg):
+    """Headless dog of :class:`UnitreeA1DogNoheadStableRoughEnvCfg` with enforced joint limits and no calf2 reward."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_limit_settings(self, dog=True)
+
+
+@configclass
+class UnitreeA1HorseNoheadLimitsRoughEnvCfg(UnitreeA1HorseNoheadStableRoughEnvCfg):
+    """Headless horse of :class:`UnitreeA1HorseNoheadStableRoughEnvCfg` with enforced joint limits."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_limit_settings(self, dog=False)
+
+
+@configclass
+class _BoundedGaussianDistributionCfg(RslRlMLPModelCfg.GaussianDistributionCfg):
+    """Gaussian action distribution whose standard deviation is clamped to :attr:`std_range`."""
+
+    std_range: tuple[float, float] = (1.0e-6, 2.0)
+    """Range of the standard deviation (passed to the rsl_rl ``GaussianDistribution``)."""
+
+
 @configclass
 class UnitreeA1DogPPORunnerCfg(UnitreeA1RoughPPORunnerCfg):
     experiment_name = "unitree_a1_dog"
@@ -379,3 +426,26 @@ class UnitreeA1HorseNoheadStablePPORunnerCfg(UnitreeA1HorseNoheadPPORunnerCfg):
     experiment_name = "unitree_a1_horse_nohead_stable"
     # joint targets are default + 0.25 * action, so 10 already covers more than the joint range
     clip_actions = 10.0
+
+
+@configclass
+class UnitreeA1DogNoheadLimitsPPORunnerCfg(UnitreeA1DogNoheadStablePPORunnerCfg):
+    experiment_name = "unitree_a1_dog_nohead_limits"
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        # with clipped actions, the noise beyond the clip costs nothing, so the entropy bonus grew the std of the
+        # horse to about 100 in the stable runs; bound it
+        self.actor.distribution_cfg = _BoundedGaussianDistributionCfg(init_std=1.0, std_type="log")
+
+
+@configclass
+class UnitreeA1HorseNoheadLimitsPPORunnerCfg(UnitreeA1HorseNoheadStablePPORunnerCfg):
+    experiment_name = "unitree_a1_horse_nohead_limits"
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        # see UnitreeA1DogNoheadLimitsPPORunnerCfg
+        self.actor.distribution_cfg = _BoundedGaussianDistributionCfg(init_std=1.0, std_type="log")
