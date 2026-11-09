@@ -264,6 +264,21 @@ Read from the ``params/env.yaml`` saved with those checkpoints: the horse pose, 
 (0.3 and -0.4 rad), which are inside the narrow limits of the dog. Spawned at 0.45 m instead of 0.42 m.
 """
 
+UNITREE_A1_DOG_NOHEAD_PAPER_CFG = clone(UNITREE_A1_DOG_NOHEAD_CFG)
+UNITREE_A1_DOG_NOHEAD_PAPER_CFG.spawn.usd_path = os.environ.get(
+    "ISAACLAB_A1_DOG_NOHEAD_PAPER_USD",
+    "/home/t-yajima/ダウンロード/dog_nohead_vis/dog_nohead_vis_paperlim.usda",
+)
+UNITREE_A1_DOG_NOHEAD_PAPER_CFG.init_state.joint_pos = dict(UNITREE_A1_DOG_CFG.init_state.joint_pos)
+"""Headless dog with the joint limits and the default pose of the headed dog (``dog_2.3.usd``).
+
+Both models have the same leg geometry (straight legs at zero joint angles), but the thigh, calf and calf2 limits of
+``dog_nohead_vis.usda`` are shifted, by up to 1.16 rad, against those of ``dog_2.3.usd``, which are the walking ranges
+of motion of Beagles (J Vet Sci 2017;18(4):521). The asset ``dog_nohead_vis_paperlim.usda`` wraps
+``dog_nohead_vis_fixed.usda`` and restores these limits, which contain the pose of the headed dog.
+Override the asset location with the ``ISAACLAB_A1_DOG_NOHEAD_PAPER_USD`` environment variable.
+"""
+
 
 UNITREE_GO1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(

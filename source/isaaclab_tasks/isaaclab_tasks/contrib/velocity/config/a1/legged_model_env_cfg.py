@@ -26,6 +26,7 @@ from isaaclab_assets.robots.unitree import (  # isort: skip
     UNITREE_A1_DOG_CFG,
     UNITREE_A1_DOG_LINK3_CFG,
     UNITREE_A1_DOG_NOHEAD_CFG,
+    UNITREE_A1_DOG_NOHEAD_PAPER_CFG,
     UNITREE_A1_DOG_VIS_CFG,
     UNITREE_A1_HORSE_CFG,
     UNITREE_A1_HORSE_NOHEAD_CFG,
@@ -41,7 +42,7 @@ _LEGS = ("FR", "FL", "RR", "RL")
 _JOINT_TORQUE_WEIGHTS = {
     f"{leg}_{joint}_joint": weight
     for leg in _LEGS
-    for joint, weight in (("hip", 1.0), ("thigh", 0.1), ("calf", 0.1), ("foot", 0.1))
+    for joint, weight in (("hip", 1.0), ("thigh", 0.1), ("calf", 0.1), ("calf2", 0.1))
 }
 
 
@@ -353,6 +354,23 @@ class UnitreeA1HorseNoheadLimitsRoughEnvCfg(UnitreeA1HorseNoheadStableRoughEnvCf
 
 
 @configclass
+class UnitreeA1DogNoheadPaperRoughEnvCfg(UnitreeA1DogNoheadLimitsRoughEnvCfg):
+    """Headless dog of :class:`UnitreeA1DogNoheadLimitsRoughEnvCfg` with the joint limits and pose of the headed dog.
+
+    See :obj:`UNITREE_A1_DOG_NOHEAD_PAPER_CFG`. Only the asset and the pose change, so that the solver settings of the
+    parent task are kept.
+    """
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        self.scene.robot.spawn = replace(
+            self.scene.robot.spawn, usd_path=UNITREE_A1_DOG_NOHEAD_PAPER_CFG.spawn.usd_path
+        )
+        self.scene.robot.init_state.joint_pos = dict(UNITREE_A1_DOG_NOHEAD_PAPER_CFG.init_state.joint_pos)
+
+
+@configclass
 class _BoundedGaussianDistributionCfg(RslRlMLPModelCfg.GaussianDistributionCfg):
     """Gaussian action distribution whose standard deviation is clamped to :attr:`std_range`."""
 
@@ -449,3 +467,8 @@ class UnitreeA1HorseNoheadLimitsPPORunnerCfg(UnitreeA1HorseNoheadStablePPORunner
 
         # see UnitreeA1DogNoheadLimitsPPORunnerCfg
         self.actor.distribution_cfg = _BoundedGaussianDistributionCfg(init_std=1.0, std_type="log")
+
+
+@configclass
+class UnitreeA1DogNoheadPaperPPORunnerCfg(UnitreeA1DogNoheadLimitsPPORunnerCfg):
+    experiment_name = "unitree_a1_dog_nohead_paper"
