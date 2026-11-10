@@ -388,6 +388,40 @@ class UnitreeA1DogNoheadPaperRoughEnvCfg(UnitreeA1DogNoheadLimitsRoughEnvCfg):
         self.scene.robot.init_state.joint_pos = dict(UNITREE_A1_DOG_NOHEAD_PAPER_CFG.init_state.joint_pos)
 
 
+def _apply_armature(cfg: UnitreeA1RoughEnvCfg) -> None:
+    """Give the leg joints the reflected rotor inertia of the motors, which the explicit PD control needs to be stable.
+
+    The URDF-converted assets author no joint armature, and the ``calf`` and ``calf2`` links are light (0.15 kg). The
+    damping term of the explicit actuator (0.5 N m s/rad, evaluated once per 5 ms physics step) is then numerically
+    unstable: with zero actions on flat ground the ``calf2`` joints flip between -21 and +21 rad/s (the velocity
+    limit) every physics step, and ``dof_acc_l2`` costs 50 to 77 per second of standing, against at most 3.75 per
+    second for perfect velocity tracking. Policies trained this way press the joints against their limits, where the
+    limit constraint stops the oscillation, instead of walking. With an armature of 0.01 kg m^2 the robot stands still
+    (``dof_acc_l2`` below 0.001 per second). The stock A1, whose calf links are heavier, does not need it.
+    """
+    cfg.scene.robot.actuators["base_legs"].armature = 0.01
+
+
+@configclass
+class UnitreeA1DogNoheadArmRoughEnvCfg(UnitreeA1DogNoheadLimitsRoughEnvCfg):
+    """Headless dog of :class:`UnitreeA1DogNoheadLimitsRoughEnvCfg` with the armature of :func:`_apply_armature`."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_armature(self)
+
+
+@configclass
+class UnitreeA1DogNoheadPaperArmRoughEnvCfg(UnitreeA1DogNoheadPaperRoughEnvCfg):
+    """Headless dog of :class:`UnitreeA1DogNoheadPaperRoughEnvCfg` with the armature of :func:`_apply_armature`."""
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        _apply_armature(self)
+
+
 @configclass
 class _BoundedGaussianDistributionCfg(RslRlMLPModelCfg.GaussianDistributionCfg):
     """Gaussian action distribution whose standard deviation is clamped to :attr:`std_range`."""
@@ -495,3 +529,13 @@ class UnitreeA1DogNoheadPaperPPORunnerCfg(UnitreeA1DogNoheadLimitsPPORunnerCfg):
 @configclass
 class UnitreeA1HorseNoheadHipPPORunnerCfg(UnitreeA1HorseNoheadLimitsPPORunnerCfg):
     experiment_name = "unitree_a1_horse_nohead_hip"
+
+
+@configclass
+class UnitreeA1DogNoheadArmPPORunnerCfg(UnitreeA1DogNoheadLimitsPPORunnerCfg):
+    experiment_name = "unitree_a1_dog_nohead_arm"
+
+
+@configclass
+class UnitreeA1DogNoheadPaperArmPPORunnerCfg(UnitreeA1DogNoheadPaperPPORunnerCfg):
+    experiment_name = "unitree_a1_dog_nohead_paper_arm"
