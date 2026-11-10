@@ -80,3 +80,22 @@ def joint_torques_weighted(
     weights = joint_weights or {}
     w = torch.tensor([weights.get(name, 1.0) for name in asset.joint_names], device=torques.device, dtype=torques.dtype)
     return torch.sum(torch.square(torques) * w, dim=1)
+
+
+def hip_inward_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, threshold: float = 0.1) -> torch.Tensor:
+    """Penalize hip joints that tilt the legs inward (toward the body midline) beyond a threshold (L2 squared kernel).
+
+    The hip axes of the models point forward, so a leg tilts inward at a negative hip angle on the left side and at a
+    positive one on the right side.
+
+    Args:
+        threshold: Inward hip angle [rad] that is not penalized.
+    """
+    asset: Articulation = env.scene[asset_cfg.name]
+    joint_pos = asset.data.joint_pos.torch[:, asset_cfg.joint_ids]
+    joint_names = [asset.joint_names[i] for i in asset_cfg.joint_ids]
+    inward_sign = torch.tensor(
+        [1.0 if name[1] == "R" else -1.0 for name in joint_names], device=joint_pos.device, dtype=joint_pos.dtype
+    )
+    excess = torch.clamp(joint_pos * inward_sign - threshold, min=0.0)
+    return torch.sum(torch.square(excess), dim=1)

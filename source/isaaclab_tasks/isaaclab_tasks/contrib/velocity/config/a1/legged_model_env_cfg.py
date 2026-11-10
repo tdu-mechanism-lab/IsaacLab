@@ -354,6 +354,24 @@ class UnitreeA1HorseNoheadLimitsRoughEnvCfg(UnitreeA1HorseNoheadStableRoughEnvCf
 
 
 @configclass
+class UnitreeA1HorseNoheadHipRoughEnvCfg(UnitreeA1HorseNoheadLimitsRoughEnvCfg):
+    """Headless horse of :class:`UnitreeA1HorseNoheadLimitsRoughEnvCfg` with a penalty on inward-tilted legs.
+
+    The horse trained without it stood with three hips pressed against their inward limits (up to 0.63 rad). Inward hip
+    angles up to 0.1 rad are free.
+    """
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        self.rewards.hip_inward = RewTerm(
+            func=mdp.hip_inward_l2,
+            weight=-1.0,
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_hip_joint"), "threshold": 0.1},
+        )
+
+
+@configclass
 class UnitreeA1DogNoheadPaperRoughEnvCfg(UnitreeA1DogNoheadLimitsRoughEnvCfg):
     """Headless dog of :class:`UnitreeA1DogNoheadLimitsRoughEnvCfg` with the joint limits and pose of the headed dog.
 
@@ -472,3 +490,8 @@ class UnitreeA1HorseNoheadLimitsPPORunnerCfg(UnitreeA1HorseNoheadStablePPORunner
 @configclass
 class UnitreeA1DogNoheadPaperPPORunnerCfg(UnitreeA1DogNoheadLimitsPPORunnerCfg):
     experiment_name = "unitree_a1_dog_nohead_paper"
+
+
+@configclass
+class UnitreeA1HorseNoheadHipPPORunnerCfg(UnitreeA1HorseNoheadLimitsPPORunnerCfg):
+    experiment_name = "unitree_a1_horse_nohead_hip"
