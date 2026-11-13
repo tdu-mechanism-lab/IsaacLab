@@ -60,6 +60,7 @@ for _model in (
     "HorseNoheadHip",
     "DogNoheadArm",
     "DogNoheadPaperArm",
+    "HorseNoheadArm",
 ):
     gym.register(
         id=f"IsaacContrib-Velocity-Rough-UnitreeA1{_model}",
